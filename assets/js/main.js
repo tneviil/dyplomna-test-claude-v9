@@ -334,21 +334,30 @@
     }
   })();
 
-  /* ---------------------------------------------------- UTM persistence */
+  /* ---------------------------------------------------- UTM persistence
+     Stored in localStorage only with marketing consent (cookie banner, 01.10.2026); without it the order form still
+     sends the UTM tags of the page it is sent from. consent.js calls window.dypStoreUtms() when consent is given. */
   (() => {
-    try {
-      const params = new URLSearchParams(location.search);
+    const current = () => {
       const utms = {};
-      for (const [k, v] of params) if (k.startsWith('utm_') && v) utms[k] = v;
-      if (!utms.utm_source && document.referrer) {
-        try {
+      try {
+        const params = new URLSearchParams(location.search);
+        for (const [k, v] of params) if (k.startsWith('utm_') && v) utms[k] = v;
+        if (!utms.utm_source && document.referrer) {
           const ref = new URL(document.referrer);
           if (ref.origin !== location.origin) utms.utm_source = ref.hostname.replace(/^www\./, '');
-        } catch (_) { /* ignore */ }
-      }
-      const prev = JSON.parse(localStorage.getItem('utms') || '{}');
-      localStorage.setItem('utms', JSON.stringify({ ...prev, ...utms }));
-    } catch (_) { /* storage unavailable */ }
+        }
+      } catch (_) { /* ignore */ }
+      return utms;
+    };
+    window.dypCurrentUtms = current;
+    window.dypStoreUtms = () => {
+      try {
+        const prev = JSON.parse(localStorage.getItem('utms') || '{}');
+        localStorage.setItem('utms', JSON.stringify({ ...prev, ...current() }));
+      } catch (_) { /* storage unavailable */ }
+    };
+    if (window.dypConsent && window.dypConsent.mkt) window.dypStoreUtms();
   })();
 
   /* ------------------------------------------------------------ lead form
@@ -358,7 +367,11 @@
     if (window.__leadformBound) return;
     window.__leadformBound = true;
 
-    const getUTMs = () => { try { return JSON.parse(localStorage.getItem('utms') || '{}'); } catch { return {}; } };
+    const getUTMs = () => { // stored ones (marketing consent) or, without consent, those of this page
+      let stored = {};
+      try { stored = JSON.parse(localStorage.getItem('utms') || '{}'); } catch { stored = {}; }
+      return Object.keys(stored).length ? stored : (window.dypCurrentUtms ? window.dypCurrentUtms() : {});
+    };
     const deviceInfo = () => ({ ua: navigator.userAgent, platform: navigator?.userAgentData?.platform || '' });
     const buildUserInfo = (locale) => {
       const utm = getUTMs();

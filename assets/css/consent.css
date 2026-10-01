@@ -1,0 +1,51 @@
+/* dyplomna.com - cookie consent (variant "C" of the owner's four drafts, 01.10.2026). A pill at the bottom of the page,
+   a card on phones; the settings dialog; logical properties, so right-to-left pages mirror by themselves. Uses the design
+   tokens of main.css (--ink, --muted, --surface, --line, --accent-dark ...) with fallbacks. */
+.cn-bar { position: fixed; z-index: 150; inset-inline-start: 50%; bottom: 22px; display: flex; align-items: center; gap: 14px; width: max-content; max-width: min(860px, calc(100vw - 32px)); padding: 8px 8px 8px 12px; padding-inline: 12px 8px; border-radius: 999px; background: rgba(255, 255, 255, .95); border: 1px solid var(--line, rgba(48, 57, 84, .1)); box-shadow: 0 20px 44px -18px rgba(27, 32, 53, .45); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); font-family: var(--font-body, sans-serif); color: var(--text, #303954); opacity: 0; transform: translate(-50%, 18px); transition: opacity .35s ease, transform .45s var(--ease, ease); }
+[dir="rtl"] .cn-bar { transform: translate(50%, 18px); }
+.cn-bar.is-in { opacity: 1; transform: translate(-50%, 0); }
+[dir="rtl"] .cn-bar.is-in { transform: translate(50%, 0); }
+.cn-bar__ico { flex: 0 0 auto; }
+.cn-bar__ico svg { width: 30px; height: 30px; display: block; }
+.cn-bar__txt { margin: 0; font-size: 14px; line-height: 1.45; }
+.cn-link { margin-inline-start: 4px; padding: 0; border: 0; background: none; font: 600 14px var(--font-body, sans-serif); color: var(--accent-dark, #2F86DA); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.cn-bar__btns { display: flex; gap: 6px; flex: 0 0 auto; }
+.cn-btn { min-height: 40px; min-width: 104px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line-strong, rgba(48, 57, 84, .18)); background: var(--surface, #fff); font: 700 14px var(--font-display, sans-serif); color: var(--ink, #303954); cursor: pointer; transition: background-color .2s, border-color .2s; }
+.cn-btn:hover { border-color: var(--accent-dark, #2F86DA); }
+.cn-btn--on { background: var(--accent-dark, #2F86DA); border-color: var(--accent-dark, #2F86DA); color: #fff; }
+.cn-btn--on:hover { background: #2777C6; }
+.cn-btn:focus-visible, .cn-link:focus-visible, .cn-dlg__x:focus-visible { outline: 2px solid var(--accent, #409DF6); outline-offset: 3px; }
+/* the settings dialog */
+.cn-dlg { position: fixed; inset: 0; z-index: 210; display: grid; place-items: center; padding: 16px; background: rgba(27, 32, 53, .42); opacity: 0; transition: opacity .3s ease; font-family: var(--font-body, sans-serif); color: var(--text, #303954); }
+.cn-dlg.is-in { opacity: 1; }
+.cn-dlg__card { position: relative; width: min(520px, 100%); max-height: calc(100vh - 32px); overflow: auto; padding: 26px 26px 22px; border-radius: 24px; background: var(--surface, #fff); box-shadow: 0 30px 60px -24px rgba(48, 57, 84, .28); transform: translateY(14px) scale(.98); transition: transform .4s var(--ease, ease); }
+.cn-dlg.is-in .cn-dlg__card { transform: none; }
+.cn-dlg__x { position: absolute; top: 14px; inset-inline-end: 14px; width: 38px; height: 38px; display: grid; place-items: center; padding: 0; border-radius: 50%; border: 1px solid var(--line, rgba(48, 57, 84, .1)); background: var(--surface, #fff); color: var(--ink, #303954); cursor: pointer; }
+.cn-dlg__x .ic, .cn-dlg__x svg { width: 16px; height: 16px; }
+.cn-dlg__t { margin: 0 0 6px; padding-inline-end: 44px; font-family: var(--font-display, sans-serif); font-weight: 800; font-size: 20px; color: var(--ink, #303954); }
+.cn-dlg__p { margin: 0 0 16px; font-size: 14px; line-height: 1.55; color: var(--muted, #5C6584); }
+.cn-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-top: 1px solid var(--line, rgba(48, 57, 84, .1)); }
+.cn-row__t b { display: block; font-family: var(--font-display, sans-serif); font-size: 15.5px; color: var(--ink, #303954); }
+.cn-row__t small { display: block; margin-top: 2px; font-size: 13px; line-height: 1.45; color: var(--muted, #5C6584); }
+.cn-sw { position: relative; flex: 0 0 auto; width: 46px; height: 26px; cursor: pointer; }
+.cn-sw input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; cursor: inherit; }
+.cn-sw span { position: absolute; inset: 0; border-radius: 999px; background: #C9D2E3; transition: background-color .2s; pointer-events: none; }
+.cn-sw span::after { content: ""; position: absolute; top: 3px; inset-inline-start: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(27, 32, 53, .3); transition: transform .25s var(--ease, ease); }
+.cn-sw input:checked + span { background: var(--accent-dark, #2F86DA); }
+.cn-sw input:checked + span::after { transform: translateX(20px); }
+[dir="rtl"] .cn-sw input:checked + span::after { transform: translateX(-20px); }
+.cn-sw input:disabled + span { opacity: .55; }
+.cn-sw input:disabled { cursor: not-allowed; }
+.cn-sw input:focus-visible + span { outline: 2px solid var(--accent, #409DF6); outline-offset: 3px; }
+.cn-dlg__btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; }
+.cn-dlg__btns .cn-btn { min-width: 0; min-height: 44px; padding: 0 10px; }
+@media (max-width: 760px) {
+  .cn-bar, [dir="rtl"] .cn-bar { inset-inline: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); width: auto; max-width: none; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 14px; border-radius: 22px; transform: translateY(18px); }
+  .cn-bar.is-in, [dir="rtl"] .cn-bar.is-in { transform: none; }
+  .cn-bar__txt { flex: 1; font-size: 13.5px; }
+  .cn-bar__btns { flex-basis: 100%; }
+  .cn-bar__btns .cn-btn { flex: 1; }
+  .cn-dlg__btns { grid-template-columns: 1fr 1fr; }
+  .cn-dlg__btns [data-cn-accept] { grid-column: 1 / -1; order: -1; }
+}
+@media (prefers-reduced-motion: reduce) { .cn-bar, .cn-dlg, .cn-dlg__card { transition: none; } }
