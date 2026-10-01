@@ -1402,6 +1402,7 @@
       const la = raw[2 * i] * D; const lo = raw[2 * i + 1] * D; const cl = Math.cos(la);
       px[i] = cl * Math.sin(lo); py[i] = Math.sin(la); pz[i] = cl * Math.cos(lo);
     }
+    const DOT_K = Math.sqrt(11500 / (window.__GLOBE_N || 11500)); // a denser grid gets smaller dots: the globe keeps its look
     const HOME = { lat: 44, lon: 32 };
     const view = { lat: HOME.lat, lon: HOME.lon };
     const pins = $$('[data-pin]', root);
@@ -1455,7 +1456,9 @@
       ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(c, c, R, 0, Math.PI * 2); ctx.fill();
       ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(48,57,84,.10)'; ctx.stroke();
       const r = rot();
-      const r0 = Math.max(1.3, R / 108);
+      const r0 = Math.max(1.1, R / 108 * DOT_K);
+      /* one fill per dot: Chrome draws single circles on a fast path (measured 01.10.2026: 60 fps with the doubled dots,
+         while one path of hundreds of arcs per depth group fell to ~29 fps) */
       ctx.fillStyle = '#303954';
       for (let i = 0; i < n; i++) {
         const x1 = px[i] * r.cL - pz[i] * r.sL; const z1 = px[i] * r.sL + pz[i] * r.cL;
@@ -1480,7 +1483,9 @@
         if (l.pin && (l.vis > 0 || l.po !== '0')) {
           put(l, 'pt', l.pin, 'transform', 'translate(' + q.x.toFixed(1) + 'px,' + q.y.toFixed(1) + 'px)');
           put(l, 'po', l.pin, 'opacity', l.vis.toFixed(2));
-          put(l, 'pz', l.pin, 'zIndex', String(10 + Math.max(0, Math.round(q.y)))); // the southern marker in front, as on Google Maps
+          put(l, 'pz', l.pin, 'zIndex', String(10 + Math.max(0, Math.round(900 - q.y)))); // the NORTHERN marker in front: a drop only rises
+          // above its own tip, so no tip is ever covered (01.10.2026: south-in-front hid the CIS tip on the Russia-Belarus border
+          // under Ukraine's head 27 px below it, and Poland's under Slovakia's); stays below the plaques (z 1000)
           if (l.pinIn) put(l, 'pe', l.pinIn, 'pointerEvents', l.vis > .5 ? '' : 'none'); // a marker on the back takes no taps
         }
       });
